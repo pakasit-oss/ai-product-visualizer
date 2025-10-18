@@ -654,13 +654,16 @@ def create_automation_tab():
     # แสดงจำนวนสินค้า
     uploaded_images = st.session_state.get('uploaded_reference_images', [])
     batch_images = st.session_state.get('batch_products', [])
-    reference_images = uploaded_images if uploaded_images else batch_images
+
+    # Priority: batch_images > uploaded_images (เพราะมักมีสินค้าเยอะกว่า)
+    reference_images = batch_images if batch_images else uploaded_images
 
     # Debug: แสดงข้อมูล
     st.write(f"Debug: uploaded_images = {len(uploaded_images)}, batch_images = {len(batch_images)}")
 
     if reference_images:
-        st.success(f"✅ มีสินค้า {len(reference_images)} ชิ้นพร้อมประมวลผล")
+        source = "batch_products" if batch_images else "uploaded_reference_images"
+        st.success(f"✅ มีสินค้า {len(reference_images)} ชิ้นพร้อมประมวลผล (จาก {source})")
     else:
         st.warning("⚠️ ยังไม่มีสินค้า - กรุณาโหลดสินค้าก่อน")
 
