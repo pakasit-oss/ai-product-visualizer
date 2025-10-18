@@ -147,11 +147,11 @@ class AutomationLoop:
         product_lower = product_en.lower()
 
         if "shoe" in product_lower or "sneaker" in product_lower:
-            # รองเท้า - ใช้มุมเอวลงมาเท่านั้น (waist down - legs and feet only)
-            prompt = f"Product photography: {model} in {outfit} wearing {product_en}, waist down view only, show legs and feet, no upper body, no torso, crop from waist, {location}, natural lighting, recreate scene with new outfit style, keep product design exact, change clothing completely, legs and feet focus, professional composition, 9:16 vertical"
+            # รองเท้า - ใช้มุมเอวลงมาเท่านั้น (waist down - legs and feet only) + iPhone camera style
+            prompt = f"iPhone candid photo: {model} in {outfit} wearing {product_en}, waist down view only, show legs and feet, no upper body, no torso, crop from waist, {location}, natural daylight, iPhone camera aesthetic, authentic candid shot, shallow depth of field, focus on {product_en}, 9:16 vertical portrait, natural color grading, unposed lifestyle photography, keep product design exact"
         else:
-            # สินค้าอื่นๆ - ใช้ illustration style เพื่อหลีกเลี่ยงการตรวจจับ photorealistic people
-            prompt = f"Product photography illustration: {model} in {outfit} wearing {product_en}, shoulder down view, no face visible, crop from shoulders, {location}, soft lighting, artistic illustration style, semi-realistic rendering, keep product design exact, change clothing completely, faceless mannequin aesthetic, professional composition, 9:16 vertical"
+            # สินค้าอื่นๆ - iPhone camera style + illustration เพื่อหลีกเลี่ยงการตรวจจับ photorealistic people
+            prompt = f"iPhone candid photo illustration: {model} in {outfit} wearing {product_en}, shoulder down view, no face visible, crop from shoulders, {location}, natural daylight, iPhone portrait mode aesthetic, soft background blur, focus on {product_en}, artistic semi-realistic style, 9:16 vertical portrait, natural color tone, casual lifestyle shot, faceless mannequin aesthetic, keep product design exact"
 
         return prompt
 
@@ -167,21 +167,21 @@ class AutomationLoop:
         """
         product_en = self._extract_english(product_category)
 
-        # วิธี 1: สุ่ม motion styles สำหรับรองเท้า
+        # วิธี 1: สุ่ม motion styles สำหรับรองเท้า - เน้นโพสธรรมชาติ เคลื่อนไหวช้า โฟกัสสินค้า
         if "shoe" in product_en.lower():
             motion_styles = [
-                f"The person walks forward naturally with confident steps showcasing the {product_en}, smooth steady camera follows the walking motion, continuous forward movement, natural walking pace, professional videography",
-                f"Close-up of feet in {product_en} walking steadily forward, camera tracks the natural walking motion from waist-down perspective, smooth continuous steps, dynamic movement",
-                f"The model walks forward in {product_en} with natural stride, camera smoothly follows the walking motion, continuous forward movement from shoulder-down view, professional fashion videography",
-                f"Natural walking motion showcasing {product_en}, person moves forward steadily, smooth camera tracking the walking movement, waist-down perspective, continuous steps"
+                f"Person in natural relaxed pose, subtle slow weight shifting from one foot to another showcasing the {product_en}, camera stays focused on product, minimal gentle movement, waist-down view, soft natural motion, cinematic shallow depth of field",
+                f"Slow-motion gentle walking, person takes calm relaxed steps forward in {product_en}, camera locked on product with slight tracking, smooth elegant pace, natural casual movement, product stays in sharp focus throughout",
+                f"Person standing naturally, slow subtle pose adjustments, camera slowly pulls focus to highlight {product_en} details, minimal movement, elegant composition, waist-down perspective, gentle weight shift",
+                f"Natural standing pose, person slowly shifts weight showing different angles of {product_en}, camera maintains steady focus on product, very slow gentle movement, relaxed body language, professional product cinematography"
             ]
         else:
-            # สำหรับสินค้าอื่นๆ - เน้น camera movement
+            # สำหรับสินค้าอื่นๆ - โพสธรรมชาติ กล้องเคลื่อนไหวช้า โฟกัสสินค้า
             motion_styles = [
-                f"Camera slowly rotates around the {product_en} at 360 degrees, smooth continuous circular motion, professional product showcase",
-                f"Camera dolly forward smoothly towards the {product_en}, gradual zoom in revealing product details, professional cinematography",
-                f"Slow camera pan from left to right showcasing the {product_en}, smooth horizontal movement, professional videography",
-                f"Camera smoothly moves up and down to reveal the {product_en}, vertical tracking shot, professional product showcase"
+                f"Person in natural relaxed pose, very slow subtle body movement, camera gently slides around maintaining sharp focus on {product_en}, minimal motion, elegant composition, shallow depth of field keeps product in focus",
+                f"Slow gentle camera dolly, person poses naturally and casually, camera gradually reveals {product_en} details while maintaining focus, smooth elegant movement, relaxed authentic vibe",
+                f"Person in casual natural stance, slow camera orbit around {product_en}, product stays in sharp focus as camera moves, minimal pose adjustments, soft cinematic motion, professional product showcase",
+                f"Natural lifestyle pose, camera slowly zooms in on {product_en} with smooth focus pull, person remains naturally relaxed, very gentle movement, elegant product-focused cinematography"
             ]
 
         # สุ่มเลือก 1 motion style
