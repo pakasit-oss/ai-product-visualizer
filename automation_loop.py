@@ -77,26 +77,26 @@ class AutomationLoop:
         # จับคู่ชุดตามประเภทสินค้า (outfit matching by product type)
         product_lower = product_en.lower()
 
-        # ชุดสำหรับผู้หญิง แบ่งตาม style - ทันสมัย สวย น่ารัก
+        # ชุดสำหรับผู้หญิง - เน้นกางเกงยีน กระโปรงยีน กระโปรงลูกไม้ เสื้อรัดรูป
         if gender_en.lower() == "female":
-            # Casual Trendy style - เหมาะกับรองเท้าผ้าใบ, กระเป๋าแคชชวล
+            # Casual Trendy style - กางเกงยีน + เสื้อรัดรูป
             casual_outfits = [
-                "a cute oversized graphic tee with high-waisted mom jeans",
-                "a cropped sweater with denim mini skirt",
-                "a soft pastel hoodie with white skinny jeans",
-                "a trendy crop top with high-waisted wide-leg jeans",
-                "a cozy knit cardigan with fitted leggings",
-                "a stylish denim jacket over a floral sundress"
+                "a fitted crop top with high-waisted skinny jeans",
+                "a tight-fitting tank top with slim-fit blue jeans",
+                "a body-hugging tee with high-waisted mom jeans",
+                "a fitted white t-shirt with black skinny jeans",
+                "a snug crop tank with distressed denim jeans",
+                "a form-fitting ribbed top with light-wash skinny jeans"
             ]
 
-            # Elegant/Feminine style - เหมาะกับรองเท้าส้นสูง, กระเป๋าหรู, นาฬิกา
+            # Skirt styles - กระโปรงยีน + กระโปรงลูกไม้
             elegant_outfits = [
-                "a romantic flowy midi dress with lace details",
-                "an elegant pleated skirt with a silk blouse",
-                "a chic wrap dress in soft neutral tones",
-                "a pretty pastel blazer with tailored trousers",
-                "a feminine ruffled top with a sleek pencil skirt",
-                "a sophisticated jumpsuit in elegant cream color"
+                "a fitted crop top with a short denim skirt",
+                "a tight-fitting tank top with a cute denim mini skirt",
+                "a body-hugging tee with a short lace skirt",
+                "a fitted blouse with a romantic mid-calf lace skirt",
+                "a snug ribbed top with a pretty short lace skirt",
+                "a form-fitting camisole with an elegant midi lace skirt"
             ]
 
             # จับคู่ชุดตามสินค้า
@@ -111,16 +111,16 @@ class AutomationLoop:
                 outfits = casual_outfits + elegant_outfits
 
         else:  # male or unisex
-            # ผู้ชาย - ทันสมัย หล่อ stylish
+            # ผู้ชาย - เน้นกางเกงยีน + เสื้อรัดรูปพอดีตัว
             casual_outfits = [
-                "a stylish oversized t-shirt with slim-fit black jeans",
-                "a trendy bomber jacket with casual chino pants",
-                "a modern polo shirt with fitted khaki trousers",
-                "a cool graphic tee with distressed denim jeans",
-                "a smart casual button-up shirt with dark slim jeans",
-                "a sleek black turtleneck with tailored jogger pants",
-                "a contemporary denim jacket with white sneakers outfit",
-                "a fashionable hoodie with clean minimalist joggers"
+                "a fitted t-shirt with slim-fit black jeans",
+                "a tight-fitting polo with dark blue skinny jeans",
+                "a body-hugging henley shirt with slim-fit denim jeans",
+                "a snug graphic tee with distressed skinny jeans",
+                "a fitted button-up shirt with tight black jeans",
+                "a form-fitting turtleneck with slim-fit blue jeans",
+                "a fitted crew neck tee with high-waisted slim jeans",
+                "a tight-fitting long sleeve with dark skinny jeans"
             ]
 
             outfits = casual_outfits
