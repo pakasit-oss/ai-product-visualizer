@@ -77,25 +77,26 @@ class AutomationLoop:
         # จับคู่ชุดตามประเภทสินค้า (outfit matching by product type)
         product_lower = product_en.lower()
 
-        # ชุดสำหรับผู้หญิง แบ่งตาม style
+        # ชุดสำหรับผู้หญิง แบ่งตาม style - ทันสมัย สวย น่ารัก
         if gender_en.lower() == "female":
-            # Casual style - เหมาะกับรองเท้าผ้าใบ, กระเป๋าแคชชวล
+            # Casual Trendy style - เหมาะกับรองเท้าผ้าใบ, กระเป๋าแคชชวล
             casual_outfits = [
-                "fitted jeans",
-                "denim shorts",
-                "skinny jeans",
-                "high-waisted jeans",
-                "fitted leggings",
-                "casual cargo pants"
+                "a cute oversized graphic tee with high-waisted mom jeans",
+                "a cropped sweater with denim mini skirt",
+                "a soft pastel hoodie with white skinny jeans",
+                "a trendy crop top with high-waisted wide-leg jeans",
+                "a cozy knit cardigan with fitted leggings",
+                "a stylish denim jacket over a floral sundress"
             ]
 
-            # Elegant/Formal style - เหมาะกับรองเท้าส้นสูง, กระเป๋าหรู, นาฬิกา
+            # Elegant/Feminine style - เหมาะกับรองเท้าส้นสูง, กระเป๋าหรู, นาฬิกา
             elegant_outfits = [
-                "a flowy lace skirt",
-                "a pleated midi skirt",
-                "a casual dress",
-                "a mini skirt",
-                "elegant wide-leg pants"
+                "a romantic flowy midi dress with lace details",
+                "an elegant pleated skirt with a silk blouse",
+                "a chic wrap dress in soft neutral tones",
+                "a pretty pastel blazer with tailored trousers",
+                "a feminine ruffled top with a sleek pencil skirt",
+                "a sophisticated jumpsuit in elegant cream color"
             ]
 
             # จับคู่ชุดตามสินค้า
@@ -110,16 +111,16 @@ class AutomationLoop:
                 outfits = casual_outfits + elegant_outfits
 
         else:  # male or unisex
-            # ผู้ชาย - ส่วนใหญ่เป็นแคชชวล
+            # ผู้ชาย - ทันสมัย หล่อ stylish
             casual_outfits = [
-                "fitted jeans",
-                "casual shorts",
-                "slim-fit jeans",
-                "cargo shorts",
-                "denim jeans",
-                "chino pants",
-                "jogger pants",
-                "straight-cut jeans"
+                "a stylish oversized t-shirt with slim-fit black jeans",
+                "a trendy bomber jacket with casual chino pants",
+                "a modern polo shirt with fitted khaki trousers",
+                "a cool graphic tee with distressed denim jeans",
+                "a smart casual button-up shirt with dark slim jeans",
+                "a sleek black turtleneck with tailored jogger pants",
+                "a contemporary denim jacket with white sneakers outfit",
+                "a fashionable hoodie with clean minimalist joggers"
             ]
 
             outfits = casual_outfits
