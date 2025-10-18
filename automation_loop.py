@@ -126,16 +126,23 @@ class AutomationLoop:
 
         outfit = random.choice(outfits)
 
-        # สุ่มสถานที่ที่แตกต่างกัน (location variations)
+        # สุ่มสถานที่ในไทย (Thai locations)
         locations = [
-            "in front of a modern cafe",
-            "outside a contemporary building",
-            "in a public park with trees",
-            "near a minimalist wall",
-            "by a city street corner",
-            "in front of a glass storefront",
-            "at an outdoor garden terrace",
-            "beside urban greenery"
+            "at a modern Bangkok cafe",
+            "outside Siam Paragon shopping mall",
+            "in Lumpini Park Bangkok",
+            "near a Thai temple wall",
+            "at Chatuchak Weekend Market",
+            "in front of CentralWorld",
+            "at a rooftop bar in Bangkok",
+            "beside the Chao Phraya River",
+            "at Asiatique the Riverfront",
+            "in a trendy Thonglor cafe",
+            "at Terminal 21 shopping center",
+            "near the Grand Palace area",
+            "in Sukhumvit street",
+            "at a Thai street food market",
+            "beside BTS Skytrain station"
         ]
 
         location = random.choice(locations)
