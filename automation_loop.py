@@ -1,0 +1,728 @@
+# -*- coding: utf-8 -*-
+"""
+Automation Loop Module
+สร้างภาพและวิดีโอแบบวนลูปอัตโนมัติ: รูป 1 → คลิป 1 → รูป 2 → คลิป 2...
+"""
+
+import streamlit as st
+import time
+from datetime import datetime
+from pathlib import Path
+import config
+import sys
+import io
+import random
+
+# Fix encoding for Windows console
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        # Python < 3.7
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
+
+# Helper function to suppress output (fixes Windows encoding errors)
+import os
+import contextlib
+
+@contextlib.contextmanager
+def suppress_stdout_stderr():
+    """Temporarily suppress stdout/stderr to avoid encoding errors during imports"""
+    with open(os.devnull, 'w', encoding='utf-8') as devnull:
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        try:
+            sys.stdout = devnull
+            sys.stderr = devnull
+            yield
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+
+
+class AutomationLoop:
+    """จัดการ loop สร้างภาพและวิดีโออัตโนมัติ"""
+
+    def __init__(self):
+        self.is_running = False
+        self.total_products_processed = 0
+        self.total_products_skipped = 0
+
+    def generate_simple_prompt(self, product_category: str, gender: str) -> str:
+        """
+        สร้าง prompt แบบง่ายๆ พร้อมสุ่มชุดและสถานที่เพื่อความหลากหลาย
+        จับคู่ชุดให้เข้ากับประเภทสินค้า
+
+        Args:
+            product_category: ประเภทสินค้า
+            gender: เพศของโมเดล
+
+        Returns:
+            prompt สั้นและกระชับ พร้อมสุ่มรายละเอียด
+        """
+        product_en = self._extract_english(product_category)
+        gender_en = self._extract_english(gender)
+
+        # Model type
+        if gender_en.lower() == "male":
+            model = "man"
+        elif gender_en.lower() == "female":
+            model = "woman"
+        else:
+            model = "person"
+
+        # จับคู่ชุดตามประเภทสินค้า (outfit matching by product type)
+        product_lower = product_en.lower()
+
+        # ชุดสำหรับผู้หญิง แบ่งตาม style
+        if gender_en.lower() == "female":
+            # Casual style - เหมาะกับรองเท้าผ้าใบ, กระเป๋าแคชชวล
+            casual_outfits = [
+                "fitted jeans",
+                "denim shorts",
+                "skinny jeans",
+                "high-waisted jeans",
+                "fitted leggings",
+                "casual cargo pants"
+            ]
+
+            # Elegant/Formal style - เหมาะกับรองเท้าส้นสูง, กระเป๋าหรู, นาฬิกา
+            elegant_outfits = [
+                "a flowy lace skirt",
+                "a pleated midi skirt",
+                "a casual dress",
+                "a mini skirt",
+                "elegant wide-leg pants"
+            ]
+
+            # จับคู่ชุดตามสินค้า
+            if "shoe" in product_lower or "sneaker" in product_lower:
+                # รองเท้าผ้าใบ → ชุดแคชชวล
+                outfits = casual_outfits
+            elif "bag" in product_lower or "watch" in product_lower or "sunglasses" in product_lower:
+                # กระเป๋า, นาฬิกา, แว่นตา → ใช้ได้ทั้งหมด
+                outfits = casual_outfits + elegant_outfits
+            else:
+                # สินค้าอื่นๆ → ใช้ทั้งหมด
+                outfits = casual_outfits + elegant_outfits
+
+        else:  # male or unisex
+            # ผู้ชาย - ส่วนใหญ่เป็นแคชชวล
+            casual_outfits = [
+                "fitted jeans",
+                "casual shorts",
+                "slim-fit jeans",
+                "cargo shorts",
+                "denim jeans",
+                "chino pants",
+                "jogger pants",
+                "straight-cut jeans"
+            ]
+
+            outfits = casual_outfits
+
+        outfit = random.choice(outfits)
+
+        # สุ่มสถานที่ที่แตกต่างกัน (location variations)
+        locations = [
+            "in front of a modern cafe",
+            "outside a contemporary building",
+            "in a public park with trees",
+            "near a minimalist wall",
+            "by a city street corner",
+            "in front of a glass storefront",
+            "at an outdoor garden terrace",
+            "beside urban greenery"
+        ]
+
+        location = random.choice(locations)
+
+        # Template ที่เน้นให้ AI สร้างชุดใหม่ ไม่ก็อปปี้จากภาพตัวอย่าง
+        # สำหรับรองเท้า: ใช้มุมเอวลงมาเท่านั้น เพื่อให้ Sora 2 ไม่ reject
+        # สำหรับสินค้าอื่น: ใช้มุมไหล่ลงมา แต่เน้นว่าเป็น illustration style
+
+        product_lower = product_en.lower()
+
+        if "shoe" in product_lower or "sneaker" in product_lower:
+            # รองเท้า - ใช้มุมเอวลงมาเท่านั้น (waist down - legs and feet only)
+            prompt = f"Product photography: {model} in {outfit} wearing {product_en}, waist down view only, show legs and feet, no upper body, no torso, crop from waist, {location}, natural lighting, recreate scene with new outfit style, keep product design exact, change clothing completely, legs and feet focus, professional composition, 9:16 vertical"
+        else:
+            # สินค้าอื่นๆ - ใช้ illustration style เพื่อหลีกเลี่ยงการตรวจจับ photorealistic people
+            prompt = f"Product photography illustration: {model} in {outfit} wearing {product_en}, shoulder down view, no face visible, crop from shoulders, {location}, soft lighting, artistic illustration style, semi-realistic rendering, keep product design exact, change clothing completely, faceless mannequin aesthetic, professional composition, 9:16 vertical"
+
+        return prompt
+
+    def generate_simple_video_prompt(self, product_category: str) -> str:
+        """
+        สร้าง video prompt แบบง่ายๆ พร้อมการเคลื่อนไหวที่ชัดเจน
+
+        Args:
+            product_category: ประเภทสินค้า
+
+        Returns:
+            video prompt ที่มีการเคลื่อนไหวชัดเจน
+        """
+        product_en = self._extract_english(product_category)
+
+        # วิธี 1: สุ่ม motion styles สำหรับรองเท้า
+        if "shoe" in product_en.lower():
+            motion_styles = [
+                f"The person walks forward naturally with confident steps showcasing the {product_en}, smooth steady camera follows the walking motion, continuous forward movement, natural walking pace, professional videography",
+                f"Close-up of feet in {product_en} walking steadily forward, camera tracks the natural walking motion from waist-down perspective, smooth continuous steps, dynamic movement",
+                f"The model walks forward in {product_en} with natural stride, camera smoothly follows the walking motion, continuous forward movement from shoulder-down view, professional fashion videography",
+                f"Natural walking motion showcasing {product_en}, person moves forward steadily, smooth camera tracking the walking movement, waist-down perspective, continuous steps"
+            ]
+        else:
+            # สำหรับสินค้าอื่นๆ - เน้น camera movement
+            motion_styles = [
+                f"Camera slowly rotates around the {product_en} at 360 degrees, smooth continuous circular motion, professional product showcase",
+                f"Camera dolly forward smoothly towards the {product_en}, gradual zoom in revealing product details, professional cinematography",
+                f"Slow camera pan from left to right showcasing the {product_en}, smooth horizontal movement, professional videography",
+                f"Camera smoothly moves up and down to reveal the {product_en}, vertical tracking shot, professional product showcase"
+            ]
+
+        # สุ่มเลือก 1 motion style
+        import random
+        prompt = random.choice(motion_styles)
+
+        return prompt
+
+    def _extract_english(self, text: str) -> str:
+        """แยกข้อความภาษาอังกฤษจากข้อความแบบ Thai-English"""
+        if "(" in text and ")" in text:
+            return text.split("(")[1].split(")")[0].strip()
+        return text.strip()
+
+    def run_automation_loop(
+        self,
+        reference_images: list,
+        product_category: str,
+        gender: str,
+        age_range: str,
+        ai_engine: str,
+        video_method: str = "Sora 2",
+        stop_callback=None
+    ):
+        """
+        วนลูปสร้างภาพและวิดีโอทีละชิ้น (รูป → คลิป → รูป → คลิป...)
+
+        Args:
+            reference_images: รายการรูปสินค้าอ้างอิง
+            product_category: ประเภทสินค้า
+            gender: เพศ
+            age_range: ช่วงอายุ
+            ai_engine: AI engine ที่ใช้สร้างภาพ
+            video_method: วิธีสร้างวิดีโอ
+            stop_callback: ฟังก์ชันเช็คว่าควรหยุดหรือไม่
+        """
+        # Import generators with suppressed output (prevents Windows encoding errors)
+        try:
+            with suppress_stdout_stderr():
+                from kie_generator import KieGenerator
+                from prompt_generator import PromptGenerator
+        except Exception as e:
+            st.error(f"Failed to import generators: {str(e)}")
+            return
+
+        self.is_running = True
+        self.total_products_processed = 0
+        self.total_products_skipped = 0
+
+        # Initialize generators
+        try:
+            with suppress_stdout_stderr():
+                kie_gen = KieGenerator() if "Kie.ai" in ai_engine else None
+                prompt_gen = PromptGenerator()
+
+        except Exception as e:
+            st.error(f"Error initializing generators: {str(e)}")
+            st.error("Failed to initialize generator. Please check your API key.")
+            return
+
+        # สร้าง UI containers
+        status_header = st.empty()
+        progress_container = st.container()
+        current_item_status = st.empty()
+
+        total_items = len(reference_images)
+
+        # Check Kie.ai credits if using Kie.ai engine (optional - silent fail if not available)
+        if kie_gen and "Kie.ai" in ai_engine:
+            credit_col1, credit_col2 = st.columns([3, 1])
+
+            with credit_col1:
+                try:
+                    credit_info = kie_gen.get_credits()
+                    if credit_info.get('success'):
+                        credits = credit_info.get('credits', 0)
+                        st.info(f"💳 **Kie.ai Credits**: {credits:,} {credit_info.get('currency', 'credits')}")
+
+                        # Warning if credits < 200
+                        if credits < 200:
+                            st.warning(f"⚠️ **Low Credits Warning**: You only have {credits} credits remaining!")
+                            st.warning(f"💡 Each image generation uses approximately 10-20 credits. You may need to top up soon.")
+                        elif credits < 500:
+                            st.info(f"ℹ️ You have {credits} credits. Consider topping up if you plan to generate many images.")
+                    # Silent fail if credit check endpoint is not available
+                except Exception:
+                    pass  # Credit check not available - continue without warning
+
+            with credit_col2:
+                # Top-up button - opens in new tab
+                st.markdown("&nbsp;")  # Spacing
+                st.link_button(
+                    "💰 เติมเครดิต",
+                    "https://kie.ai/billing",
+                    help="เปิดหน้าเติมเครดิต Kie.ai (New Tab)",
+                    use_container_width=True
+                )
+
+        # ใช้ st.write แทน print เพื่อหลีกเลี่ยง encoding error
+        status_header.info(f"🔄 **Automation Loop started** - Processing {total_items} products (infinite loop)")
+
+        # วนลูปไปเรื่อยๆ จนกว่าจะกด STOP
+        round_number = 1
+        while self.is_running:
+            status_header.info(f"🔄 **Round {round_number}** - Processing {total_items} products")
+
+            # วนลูปแต่ละสินค้า
+            for idx, ref_image_path in enumerate(reference_images):
+
+                # เช็คว่าควรหยุดหรือไม่
+                if stop_callback and stop_callback():
+                    status_header.warning("⏸️ **Loop หยุดโดยผู้ใช้**")
+                    self.is_running = False
+                    break
+
+                if not self.is_running:
+                    break
+
+                product_num = idx + 1
+
+                with progress_container:
+                    st.divider()
+                    st.subheader(f"📦 สินค้าที่ {product_num}/{total_items}")
+
+                    # ============ STEP 1: Generate Image ============
+                    current_item_status.info(f"🎨 **[{product_num}/{total_items}] Generating image...**")
+
+                    try:
+                        # สร้าง prompt แบบง่าย
+                        simple_prompt = self.generate_simple_prompt(product_category, gender)
+
+                        st.info(f"📝 Prompt: {simple_prompt[:100]}...")
+
+                        # เรียกฟังก์ชันสร้างภาพจาก __main__ module
+                        import sys
+                        if '__main__' in sys.modules:
+                            generate_images_from_prompt = sys.modules['__main__'].generate_images_from_prompt
+                        else:
+                            st.error("❌ ไม่พบ __main__ module - กรุณารีสตาร์ทแอป")
+                            continue
+
+                        # Set uploaded_reference_images ชั่วคราว
+                        temp_uploaded = [ref_image_path]
+                        original_uploaded = st.session_state.uploaded_reference_images.copy() if st.session_state.uploaded_reference_images else []
+                        st.session_state.uploaded_reference_images = temp_uploaded
+
+                        # สร้างรูป 1 รูป
+                        start_time = time.time()
+                        generate_images_from_prompt(
+                            prompt=simple_prompt,
+                            product_category=product_category,
+                            gender=gender,
+                            age_range=age_range,
+                            num_images=1,
+                            ai_engine=ai_engine,
+                            photo_style="iPhone Candid",
+                            location="Minimal Background",
+                            camera_angle="Waist Down",
+                            skip_display=True
+                        )
+
+                        # Restore
+                        st.session_state.uploaded_reference_images = original_uploaded
+
+                        elapsed_img = int(time.time() - start_time)
+                        current_item_status.success(f"✅ **[{product_num}/{total_items}] Image created!** ({elapsed_img} sec)")
+
+                        # Get latest image
+                        if st.session_state.generated_images:
+                            latest_image = st.session_state.generated_images[-1]
+                            st.image(latest_image['path'], caption=f"Product {product_num} image", width=300)
+
+                    except Exception as e:
+                        current_item_status.error(f"❌ **Image generation failed**: {str(e)[:150]}")
+                        st.session_state.uploaded_reference_images = original_uploaded
+                        continue
+
+                    # Check if should stop
+                    if stop_callback and stop_callback():
+                        status_header.warning("⏸️ **Loop stopped by user**")
+                        self.is_running = False
+                        break
+
+                    # ============ STEP 2: Generate Video ============
+                    current_item_status.info(f"🎬 **[{product_num}/{total_items}] Generating video...**")
+
+                    # Create placeholder for real-time progress updates
+                    video_progress_placeholder = st.empty()
+
+                    try:
+                        if not st.session_state.generated_images:
+                            st.warning("⚠️ No image to create video - skip")
+                            continue
+
+                        # Get latest image
+                        latest_image = st.session_state.generated_images[-1]
+
+                        # Generate simple video prompt
+                        video_prompt = self.generate_simple_video_prompt(product_category)
+
+                        st.info(f"🎬 Video Prompt: {video_prompt[:100]}...")
+
+                        # Check API keys (required for AI video generation)
+                        if not config.KIE_API_KEY or not config.IMGBB_API_KEY:
+                            st.error("❌ KIE_API_KEY and IMGBB_API_KEY required for AI video generation")
+                            continue
+
+                        # Define progress callback for real-time updates
+                        def update_video_progress(elapsed_seconds, remaining_str="", status_method=""):
+                            """Update video generation progress in real-time"""
+                            minutes = int(elapsed_seconds // 60)
+                            seconds = int(elapsed_seconds % 60)
+
+                            if minutes > 0:
+                                time_display = f"{minutes} นาที {seconds} วินาที"
+                            else:
+                                time_display = f"{seconds} วินาที"
+
+                            # Update placeholder with current progress
+                            video_progress_placeholder.info(
+                                f"⏰ **สร้างวิดีโอ...** {time_display} {remaining_str}"
+                            )
+
+                        # Initialize video creator - AI only (Veo3 or Sora 2)
+                        if "Veo3" in video_method:
+                            from veo_video_creator import Veo3VideoCreator
+                            video_creator = Veo3VideoCreator()
+
+                            start_time_vid = time.time()
+
+                            # Upload to imgbb
+                            image_url = kie_gen.upload_image_to_imgbb(latest_image['path'], config.IMGBB_API_KEY)
+
+                            # Create video with progress callback
+                            result = video_creator.create_video_from_images(
+                                image_urls=[image_url],
+                                prompt=video_prompt,
+                                filename=f"auto_r{round_number}_veo_p{product_num}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4",
+                                aspect_ratio="9:16",
+                                watermark=None,
+                                progress_callback=update_video_progress
+                            )
+
+                        else:  # Sora 2
+                            from sora2_video_creator import Sora2VideoCreator
+                            video_creator = Sora2VideoCreator()
+
+                            start_time_vid = time.time()
+
+                            # Upload to imgbb
+                            image_url = kie_gen.upload_image_to_imgbb(latest_image['path'], config.IMGBB_API_KEY)
+
+                            # Create video with progress callback
+                            result = video_creator.create_video_from_image(
+                                image_url=image_url,
+                                prompt=video_prompt,
+                                filename=f"auto_r{round_number}_sora_p{product_num}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4",
+                                aspect_ratio="portrait",
+                                remove_watermark=True,
+                                progress_callback=update_video_progress
+                            )
+
+                        elapsed_vid = int(time.time() - start_time_vid)
+                        current_item_status.success(f"✅ **[{product_num}/{total_items}] Video created!** ({elapsed_vid} sec)")
+
+                        # Save video data
+                        video_data = {
+                            'path': result['path'],
+                            'method': f'{video_method} (Auto Loop)',
+                            'task_id': result.get('task_id', ''),
+                            'prompt': video_prompt,
+                            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            'filename': Path(result['path']).name,
+                            'image_used': latest_image['path']
+                        }
+                        st.session_state.generated_videos.append(video_data)
+
+                        # Show preview (reduced size - 400px width)
+                        if Path(result['path']).exists():
+                            preview_col1, preview_col2 = st.columns([1, 2])
+                            with preview_col1:
+                                st.video(result['path'])
+                                st.caption(f"⏱️ Time: {elapsed_vid} sec")
+
+                        self.total_products_processed += 1
+
+                    except TimeoutError as e:
+                        error_msg = str(e)
+                        current_item_status.warning(f"⏱️ **Video generation timeout**: {error_msg[:150]}")
+                        st.warning(f"⏭️ **Skipping Product {product_num}** - Video generation took too long")
+                        st.info("💡 Continuing with next product...")
+                        self.total_products_skipped += 1
+                        continue
+
+                    except Exception as e:
+                        error_msg = str(e)
+                        current_item_status.error(f"❌ **Video generation failed**: {error_msg[:150]}")
+
+                        # Auto-fallback to Veo3 if Sora 2 fails due to photorealistic people
+                        if 'photorealistic people' in error_msg.lower() and "Sora" in video_method:
+                            st.warning("🚫 Image contains real people - Sora 2 not supported")
+                            st.info("🔄 **Auto-fallback: Trying Veo3 instead...**")
+
+                            try:
+                                from veo_video_creator import Veo3VideoCreator
+                                video_creator_veo = Veo3VideoCreator()
+
+                                start_time_veo = time.time()
+
+                                # Create video with Veo3 (already have image_url from Sora attempt)
+                                result = video_creator_veo.create_video_from_images(
+                                    image_urls=[image_url],
+                                    prompt=video_prompt,
+                                    filename=f"auto_r{round_number}_veo_p{product_num}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4",
+                                    aspect_ratio="9:16",
+                                    watermark=None,
+                                    progress_callback=update_video_progress
+                                )
+
+                                elapsed_vid = int(time.time() - start_time_veo)
+                                current_item_status.success(f"✅ **[{product_num}/{total_items}] Video created with Veo3!** ({elapsed_vid} sec)")
+
+                                # Save video data
+                                video_data = {
+                                    'path': result['path'],
+                                    'method': 'Veo3 (Auto-fallback)',
+                                    'task_id': result.get('task_id', ''),
+                                    'prompt': video_prompt,
+                                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                    'filename': Path(result['path']).name,
+                                    'image_used': latest_image['path']
+                                }
+                                st.session_state.generated_videos.append(video_data)
+
+                                # Show preview
+                                if Path(result['path']).exists():
+                                    preview_col1, preview_col2 = st.columns([1, 2])
+                                    with preview_col1:
+                                        st.video(result['path'])
+                                        st.caption(f"⏱️ Time: {elapsed_vid} sec (Veo3)")
+
+                                self.total_products_processed += 1
+
+                                # Don't skip - continue to next product successfully
+                                progress = (product_num / total_items) * 100
+                                status_header.success(f"📊 **Round {round_number} - Progress: {product_num}/{total_items} products ({progress:.1f}%)**")
+                                continue
+
+                            except Exception as veo_error:
+                                st.error(f"❌ **Veo3 fallback also failed**: {str(veo_error)[:150]}")
+                                st.warning(f"⏭️ **Skipping Product {product_num}** - Both Sora 2 and Veo3 failed")
+                                self.total_products_skipped += 1
+                                continue
+
+                        elif 'timeout' in error_msg.lower():
+                            st.warning(f"⏱️ Video generation timeout after waiting")
+
+                        st.warning(f"⏭️ **Skipping Product {product_num}** - Will continue with next product")
+                        self.total_products_skipped += 1
+                        continue
+
+                    # Show progress
+                    progress = (product_num / total_items) * 100
+                    status_header.success(f"📊 **Round {round_number} - Progress: {product_num}/{total_items} products ({progress:.1f}%)**")
+
+            # เสร็จ 1 รอบแล้ว - เช็คว่าควรหยุดหรือไม่
+            if not self.is_running:
+                break
+
+            # เพิ่มรอบและเริ่มใหม่
+            round_number += 1
+            status_header.success(f"✅ **Round {round_number - 1} Complete!** Starting Round {round_number}...")
+            time.sleep(1)  # รอ 1 วินาทีก่อนเริ่มรอบใหม่
+
+        # Summary
+        self.is_running = False
+
+        if self.total_products_processed > 0:
+            st.balloons()
+            total_attempted = self.total_products_processed + self.total_products_skipped
+            success_rate = (self.total_products_processed / total_attempted * 100) if total_attempted > 0 else 0
+
+            st.success(f"""
+            🎉 **Automation Loop Complete!**
+
+            📊 Summary:
+            - Products processed: {self.total_products_processed}/{total_items}
+            - Products skipped: {self.total_products_skipped}
+            - Success rate: {success_rate:.1f}%
+            - Method: {video_method}
+            """)
+        else:
+            st.warning("⚠️ No products processed successfully")
+
+
+# Helper function สำหรับใช้ใน main.py
+def create_automation_tab():
+    """สร้าง UI tab สำหรับ Automation Loop"""
+
+    st.header("🔄 Automation Loop")
+    st.markdown("### วนลูปสร้างรูปและคลิปอัตโนมัติ: รูป → คลิป → รูป → คลิป...")
+
+    # Initialize session state - ใช้ setdefault แทน if check
+    st.session_state.setdefault('loop_is_running', False)
+    st.session_state.setdefault('loop_should_start', False)
+
+    # Settings
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("⚙️ ตั้งค่า")
+
+        loop_product_category = st.selectbox(
+            "ประเภทสินค้า",
+            config.PRODUCT_CATEGORIES,
+            key="loop_product_category"
+        )
+
+        loop_gender = st.selectbox(
+            "เพศ",
+            config.GENDER_OPTIONS,
+            key="loop_gender"
+        )
+
+        loop_age_range = st.selectbox(
+            "ช่วงอายุ",
+            config.AGE_RANGES,
+            key="loop_age_range"
+        )
+
+    with col2:
+        st.subheader("🎨 AI Engine")
+
+        loop_ai_engine = st.selectbox(
+            "AI สร้างภาพ",
+            config.AI_ENGINES,
+            key="loop_ai_engine"
+        )
+
+        loop_video_method = st.selectbox(
+            "วิธีสร้างวิดีโอ (AI เท่านั้น)",
+            ["Veo3 (แนะนำ)", "Sora 2"],
+            key="loop_video_method"
+        )
+
+    st.divider()
+
+    # โหลดสินค้า
+    st.subheader("📦 โหลดสินค้า")
+
+    # ปุ่มโหลดสินค้าจากโฟลเดอร์
+    if st.button("📂 โหลดสินค้าจากโฟลเดอร์", key="loop_load_batch"):
+        # ใช้ sys.modules เพื่อหลีกเลี่ยง circular import
+        import sys
+        if '__main__' in sys.modules:
+            batch_load_products_from_folder = sys.modules['__main__'].batch_load_products_from_folder
+            batch_load_products_from_folder()
+        else:
+            st.error("❌ ไม่พบ __main__ module - กรุณารีสตาร์ทแอป")
+
+    # แสดงจำนวนสินค้า
+    uploaded_images = st.session_state.get('uploaded_reference_images', [])
+    batch_images = st.session_state.get('batch_products', [])
+    reference_images = uploaded_images if uploaded_images else batch_images
+
+    # Debug: แสดงข้อมูล
+    st.write(f"Debug: uploaded_images = {len(uploaded_images)}, batch_images = {len(batch_images)}")
+
+    if reference_images:
+        st.success(f"✅ มีสินค้า {len(reference_images)} ชิ้นพร้อมประมวลผล")
+    else:
+        st.warning("⚠️ ยังไม่มีสินค้า - กรุณาโหลดสินค้าก่อน")
+
+    st.divider()
+
+    # Start/Stop Buttons
+    st.subheader("🎮 ควบคุม")
+
+    col_btn1, col_btn2, col_btn3 = st.columns(3)
+
+    with col_btn1:
+        start_disabled = st.session_state.loop_is_running or len(reference_images) == 0
+        st.write(f"Debug START: disabled={start_disabled}, running={st.session_state.loop_is_running}, imgs={len(reference_images)}")
+
+        if st.button("▶️ START LOOP", type="primary", disabled=start_disabled, key="start_loop_btn"):
+            st.write("🔴 START button clicked!")
+            st.session_state.loop_should_start = True
+            st.session_state.loop_is_running = True
+            st.write(f"🔴 Set loop_should_start = {st.session_state.loop_should_start}")
+            st.write(f"🔴 Set loop_is_running = {st.session_state.loop_is_running}")
+
+    with col_btn2:
+        if st.button("⏸️ STOP LOOP", type="secondary", disabled=not st.session_state.loop_is_running, key="stop_loop_btn"):
+            st.session_state.loop_is_running = False
+            st.warning("🛑 Loop จะหยุดหลังจากสินค้าปัจจุบันเสร็จ...")
+
+    with col_btn3:
+        if st.button("🔄 RESET", key="reset_loop_btn"):
+            st.session_state.loop_is_running = False
+            st.success("✅ รีเซ็ตสถานะเรียบร้อย")
+
+    # แสดงสถานะ
+    if st.session_state.loop_is_running:
+        st.info("🔄 **Loop กำลังทำงาน...** กด STOP เพื่อหยุด")
+    else:
+        st.info("⏸️ **Loop หยุดอยู่** กด START เพื่อเริ่ม")
+
+    st.divider()
+
+    # Debug: แสดงสถานะ
+    st.write(f"Debug LOOP EXEC: loop_is_running = {st.session_state.loop_is_running}, loop_should_start = {st.session_state.get('loop_should_start', False)}, reference_images count = {len(reference_images)}")
+
+    # ใช้ loop_should_start แทน loop_is_running เพื่อเริ่ม loop
+    condition_met = st.session_state.get('loop_should_start', False) and len(reference_images) > 0
+    st.write(f"Debug CONDITION: condition_met = {condition_met}")
+
+    # เริ่มต้น loop ถ้ากด start
+    if condition_met:
+        # Reset flag
+        st.session_state.loop_should_start = False
+        st.warning(f"🚀 กำลังเริ่มต้น loop สำหรับ {len(reference_images)} สินค้า...")
+        st.write(f"🟢 ENTERING LOOP EXECUTION...")
+
+        def check_should_stop():
+            """เช็คว่าควรหยุด loop หรือไม่"""
+            return not st.session_state.loop_is_running
+
+        # สร้าง AutomationLoop และเริ่มทำงาน
+        automation = AutomationLoop()
+
+        automation.run_automation_loop(
+            reference_images=reference_images,
+            product_category=loop_product_category,
+            gender=loop_gender,
+            age_range=loop_age_range,
+            ai_engine=loop_ai_engine,
+            video_method=loop_video_method,
+            stop_callback=check_should_stop
+        )
+
+        # Loop เสร็จแล้ว - รีเซ็ตสถานะ
+        st.session_state.loop_is_running = False
+        st.session_state.loop_should_start = False
+        st.success("✅ Loop เสร็จสมบูรณ์แล้ว!")

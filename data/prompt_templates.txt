@@ -1,0 +1,139 @@
+================================================================================
+AI PRODUCT VISUALIZER - PROMPT TEMPLATES LIBRARY
+================================================================================
+
+
+================================================================================
+PRODUCT: รองเท้า (Shoes)
+================================================================================
+
+--- DALL-E 3 VARIANTS ---
+
+Variant 1:
+Lifestyle brand photography, golden hour lighting, sharp focus, high quality, adult person, wearing stylish shoes, full body photograph, relaxed posture, neutral background, vertical format 9:16
+
+Variant 2:
+High-end commercial photography, professional studio setup, sharp focus, high quality, adult person, wearing stylish shoes, full body photograph, standing naturally, neutral background, vertical format 9:16
+
+Variant 3:
+Editorial fashion photography, natural lighting, pristine quality, commercial standard, adult person, wearing stylish shoes, full body photograph, dynamic pose, neutral background, vertical format 9:16
+
+--- STABLE DIFFUSION XL VARIANTS ---
+
+Variant 1:
+A adult Thai unisex in a clean modern garden café, standing slightly sideways showing both shoes. Presenting Shoes clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 2:
+A adult Thai unisex in a urban street setting, walking pose showcasing the footwear. Presenting Shoes clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 3:
+A adult Thai unisex in a minimalist studio with concrete floor, shoes in focus. Presenting Shoes clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+
+================================================================================
+PRODUCT: เสื้อผ้า (Clothing)
+================================================================================
+
+--- DALL-E 3 VARIANTS ---
+
+Variant 1:
+Minimalist modern photography, bright daylight, crystal clear, magazine quality, adult person, wearing fashionable outfit, full body photograph, dynamic pose, elegant indoor environment, vertical format 9:16
+
+Variant 2:
+Minimalist modern photography, soft studio lighting, sharp focus, high quality, adult person, wearing fashionable outfit, full body photograph, confident pose, elegant indoor environment, vertical format 9:16
+
+Variant 3:
+Professional product photography, soft studio lighting, ultra detailed, high resolution, adult person, wearing fashionable outfit, full body photograph, dynamic pose, clean white background, vertical format 9:16
+
+--- STABLE DIFFUSION XL VARIANTS ---
+
+Variant 1:
+A adult Thai unisex in a contemporary outdoor setting, full body showing the outfit. Presenting Clothing clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 2:
+A adult Thai unisex in a modern café interior, seated pose showing the clothing style. Presenting Clothing clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 3:
+A adult Thai unisex in a urban park environment, natural walking pose. Presenting Clothing clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+
+================================================================================
+PRODUCT: กระเป๋า (Bags)
+================================================================================
+
+--- DALL-E 3 VARIANTS ---
+
+Variant 1:
+High-end commercial photography, soft studio lighting, crystal clear, magazine quality, adult person, carrying designer bag, lifestyle photograph, dynamic pose, elegant indoor environment, vertical format 9:16
+
+Variant 2:
+Minimalist modern photography, soft studio lighting, pristine quality, commercial standard, adult person, carrying designer bag, lifestyle photograph, confident pose, clean white background, vertical format 9:16
+
+Variant 3:
+Professional product photography, golden hour lighting, pristine quality, commercial standard, adult person, carrying designer bag, lifestyle photograph, dynamic pose, elegant indoor environment, vertical format 9:16
+
+--- STABLE DIFFUSION XL VARIANTS ---
+
+Variant 1:
+A adult Thai unisex in a urban lifestyle setting, holding the bag prominently. Presenting Bags clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 2:
+A adult Thai unisex in a modern coffee shop, bag on table with person nearby. Presenting Bags clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 3:
+A adult Thai unisex in a city sidewalk, carrying bag in natural pose. Presenting Bags clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+
+================================================================================
+PRODUCT: นาฬิกา (Watch)
+================================================================================
+
+--- DALL-E 3 VARIANTS ---
+
+Variant 1:
+Editorial fashion photography, natural lighting, ultra detailed, high resolution, adult person, wearing wristwatch, close-up photograph, standing naturally, neutral background, vertical format 9:16
+
+Variant 2:
+Professional product photography, professional studio setup, crisp details, professional grade, adult person, wearing wristwatch, close-up photograph, standing naturally, elegant indoor environment, vertical format 9:16
+
+Variant 3:
+Editorial fashion photography, professional studio setup, crisp details, professional grade, adult person, wearing wristwatch, close-up photograph, casual stance, neutral background, vertical format 9:16
+
+--- STABLE DIFFUSION XL VARIANTS ---
+
+Variant 1:
+A adult Thai unisex in a minimalist café interior, close-up of wrist showing the watch. Presenting Watch clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 2:
+A adult Thai unisex in a modern office setting, watch detail shot. Presenting Watch clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 3:
+A adult Thai unisex in a outdoor bench, wrist and watch in natural light. Presenting Watch clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+
+================================================================================
+PRODUCT: แว่นตา (Sunglasses)
+================================================================================
+
+--- DALL-E 3 VARIANTS ---
+
+Variant 1:
+Minimalist modern photography, golden hour lighting, sharp focus, high quality, adult person, wearing sunglasses, portrait photograph, confident pose, urban outdoor setting, vertical format 9:16
+
+Variant 2:
+Professional product photography, golden hour lighting, crisp details, professional grade, adult person, wearing sunglasses, portrait photograph, casual stance, neutral background, vertical format 9:16
+
+Variant 3:
+High-end commercial photography, bright daylight, ultra detailed, high resolution, adult person, wearing sunglasses, portrait photograph, casual stance, modern minimalist setting, vertical format 9:16
+
+--- STABLE DIFFUSION XL VARIANTS ---
+
+Variant 1:
+A adult Thai unisex in a bright outdoor terrace, portrait style showing sunglasses. Presenting Sunglasses clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 2:
+A adult Thai unisex in a beach setting, sunglasses in focus. Presenting Sunglasses clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+
+Variant 3:
+A adult Thai unisex in a urban rooftop, casual pose with sunglasses. Presenting Sunglasses clearly and prominently. Focus on the product, match design, color, and texture to the reference image. Bright natural daylight, realistic iPhone photo style, candid composition. Sharp focus, professional product photography, vertical format 9:16
+

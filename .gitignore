@@ -1,0 +1,79 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project specific
+results/images/*.png
+results/images/*.jpg
+results/images/*.jpeg
+results/videos/*.mp4
+data/*.csv
+
+# Lifestyle workflow outputs
+outputs/*.png
+outputs/*.jpg
+outputs/*.jpeg
+products/*.png
+products/*.jpg
+products/*.jpeg
+batch_results.json
+config_local.json
+
+# Keep directory structure
+!results/images/.gitkeep
+!results/videos/.gitkeep
+!data/.gitkeep
+!outputs/.gitkeep
+!products/.gitkeep
+
+# API Keys and secrets
+.env.local
+secrets.toml
+.streamlit/secrets.toml
+
+# Logs
+*.log
+
+# Temporary files
+temp_*
+*.tmp
+.env.local
+nul

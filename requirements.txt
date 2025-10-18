@@ -1,0 +1,36 @@
+# AI Product Visualizer - Requirements
+# Python 3.10+
+
+# =============================================================================
+# For Lifestyle Image Generator Workflow (run_workflow.py)
+# Minimal dependencies required - just requests!
+# =============================================================================
+requests>=2.31.0
+
+# =============================================================================
+# For Original AI Product Visualizer (main.py with Streamlit)
+# =============================================================================
+
+# Core dependencies
+streamlit>=1.28.0
+openai>=1.3.0
+pandas>=2.0.0
+Pillow>=10.0.0
+
+# AI Image Generation
+replicate>=0.22.0
+
+# Google Gemini AI (Primary)
+google-generativeai>=0.3.0
+google-cloud-aiplatform>=1.38.0  # For Imagen API
+
+# Video creation
+moviepy>=1.0.3
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.9
+
+# Additional utilities
+python-dotenv>=1.0.0
+
+# Optional: For better video encoding
+# ffmpeg-python>=0.2.0
