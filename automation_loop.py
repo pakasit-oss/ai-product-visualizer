@@ -238,6 +238,7 @@ class AutomationLoop:
         self.is_running = True
         self.total_products_processed = 0
         self.total_products_skipped = 0
+        self.consecutive_failures = 0  # Track consecutive failures
 
         # Initialize generators
         try:
@@ -296,6 +297,26 @@ class AutomationLoop:
         round_number = 1
         while self.is_running:
             status_header.info(f"🔄 **Round {round_number}** - Processing {total_items} products")
+
+            # เช็คเครดิตก่อนเริ่ม round ใหม่ (สำหรับ Kie.ai)
+            if "Kie.ai" in ai_engine:
+                try:
+                    credit_info = kie_gen.get_credits()
+                    if credit_info.get('success'):
+                        credits = credit_info.get('credits', 0)
+                        st.info(f"💳 Credits remaining: {credits:,}")
+
+                        # หยุด loop ถ้าเครดิตน้อยกว่า 50
+                        if credits < 50:
+                            st.error(f"🚫 **LOOP STOPPED: Insufficient credits ({credits} remaining)**")
+                            st.error("Please top up your Kie.ai credits to continue")
+                            st.link_button("💰 Top up credits", "https://kie.ai/billing")
+                            self.is_running = False
+                            break
+                        elif credits < 200:
+                            st.warning(f"⚠️ Low credits warning: {credits} remaining")
+                except Exception:
+                    pass  # Continue if credit check fails
 
             # วนลูปแต่ละสินค้า
             for idx, ref_image_path in enumerate(reference_images):
@@ -362,10 +383,27 @@ class AutomationLoop:
                         if st.session_state.generated_images:
                             latest_image = st.session_state.generated_images[-1]
                             st.image(latest_image['path'], caption=f"Product {product_num} image", width=300)
+                            # Reset consecutive failures on success
+                            self.consecutive_failures = 0
 
                     except Exception as e:
                         current_item_status.error(f"❌ **Image generation failed**: {str(e)[:150]}")
                         st.session_state.uploaded_reference_images = original_uploaded
+
+                        # Track consecutive failures
+                        self.consecutive_failures += 1
+
+                        # Stop loop if too many consecutive failures
+                        if self.consecutive_failures >= 5:
+                            st.error(f"🚫 **LOOP STOPPED: {self.consecutive_failures} consecutive image generation failures**")
+                            st.error("Possible causes:")
+                            st.error("- Insufficient API credits")
+                            st.error("- API key expired or invalid")
+                            st.error("- Network connection issues")
+                            st.error("- API service temporarily unavailable")
+                            self.is_running = False
+                            break
+
                         continue
 
                     # Check if should stop
