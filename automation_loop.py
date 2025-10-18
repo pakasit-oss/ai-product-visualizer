@@ -127,23 +127,23 @@ class AutomationLoop:
 
         outfit = random.choice(outfits)
 
-        # สุ่มสถานที่ในไทย (Thai locations)
+        # สุ่มสถานที่ในไทย - เน้นสวนสาธารณะและหน้าคาเฟ่ (ไม่มีคนอื่น)
         locations = [
-            "at a modern Bangkok cafe",
-            "outside Siam Paragon shopping mall",
-            "in Lumpini Park Bangkok",
-            "near a Thai temple wall",
-            "at Chatuchak Weekend Market",
-            "in front of CentralWorld",
-            "at a rooftop bar in Bangkok",
-            "beside the Chao Phraya River",
-            "at Asiatique the Riverfront",
-            "in a trendy Thonglor cafe",
-            "at Terminal 21 shopping center",
-            "near the Grand Palace area",
-            "in Sukhumvit street",
-            "at a Thai street food market",
-            "beside BTS Skytrain station"
+            "in front of a quiet modern Bangkok cafe, empty background",
+            "at a peaceful garden area in Lumpini Park, no other people",
+            "outside a cozy Thonglor cafe, clean empty surroundings",
+            "in a serene public park with green trees, isolated setting",
+            "at a tranquil Thai cafe terrace, no crowds",
+            "beside a calm park pathway, peaceful atmosphere",
+            "in front of a minimalist Bangkok cafe, clean background",
+            "at a quiet corner of Benjakitti Park, empty space",
+            "outside a stylish Ari cafe, deserted area",
+            "in a peaceful garden setting, solitary environment",
+            "at a serene cafe courtyard, no other people visible",
+            "beside park greenery, empty peaceful surroundings",
+            "in front of a modern cafe entrance, isolated shot",
+            "at a calm public park area, clean empty background",
+            "outside a chic Bangkok cafe, peaceful solitary setting"
         ]
 
         location = random.choice(locations)
@@ -156,10 +156,10 @@ class AutomationLoop:
 
         if "shoe" in product_lower or "sneaker" in product_lower:
             # รองเท้า - ใช้มุมเอวลงมาเท่านั้น (waist down - legs and feet only) + iPhone camera style
-            prompt = f"iPhone candid photo: {model} in {outfit} wearing {product_en}, waist down view only, show legs and feet, no upper body, no torso, crop from waist, {location}, natural daylight, iPhone camera aesthetic, authentic candid shot, shallow depth of field, focus on {product_en}, 9:16 vertical portrait, natural color grading, unposed lifestyle photography, keep product design exact"
+            prompt = f"iPhone candid photo: single {model} in {outfit} wearing {product_en}, waist down view only, show legs and feet, no upper body, no torso, crop from waist, {location}, natural daylight, iPhone camera aesthetic, authentic candid shot, shallow depth of field, focus on {product_en}, 9:16 vertical portrait, natural color grading, unposed lifestyle photography, solo person only no other people in background, keep product design exact"
         else:
             # สินค้าอื่นๆ - iPhone camera style + illustration เพื่อหลีกเลี่ยงการตรวจจับ photorealistic people
-            prompt = f"iPhone candid photo illustration: {model} in {outfit} wearing {product_en}, shoulder down view, no face visible, crop from shoulders, {location}, natural daylight, iPhone portrait mode aesthetic, soft background blur, focus on {product_en}, artistic semi-realistic style, 9:16 vertical portrait, natural color tone, casual lifestyle shot, faceless mannequin aesthetic, keep product design exact"
+            prompt = f"iPhone candid photo illustration: single {model} in {outfit} wearing {product_en}, shoulder down view, no face visible, crop from shoulders, {location}, natural daylight, iPhone portrait mode aesthetic, soft background blur, focus on {product_en}, artistic semi-realistic style, 9:16 vertical portrait, natural color tone, casual lifestyle shot, faceless mannequin aesthetic, solo person only no other people in scene, keep product design exact"
 
         return prompt
 
