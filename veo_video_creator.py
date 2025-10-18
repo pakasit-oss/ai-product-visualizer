@@ -239,7 +239,7 @@ class Veo3VideoCreator:
         self,
         task_id: str,
         webhook_id: Optional[str] = None,
-        max_wait_time: int = 600,  # 10 minutes timeout - Veo3 can be slow
+        max_wait_time: int = 1800,  # 30 minutes timeout - Veo3 can be very slow
         poll_interval: int = 10,
         progress_callback = None
     ) -> Dict:
