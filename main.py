@@ -15,10 +15,18 @@ import random
 import config
 from prompt_generator import PromptGenerator
 from dalle_generator import DALLEGenerator
-from video_creator import VideoCreator
 from kie_generator import KieGenerator
 from veo_video_creator import Veo3VideoCreator
 from sora2_video_creator import Sora2VideoCreator
+
+# Import VideoCreator with optional moviepy support
+try:
+    from video_creator import VideoCreator
+    VIDEO_CREATOR_AVAILABLE = True
+except ImportError as e:
+    VIDEO_CREATOR_AVAILABLE = False
+    VideoCreator = None
+    print(f"VideoCreator not available: {e}")
 
 
 # Page configuration

@@ -7,8 +7,17 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Optional
 from PIL import Image
-from moviepy.editor import ImageClip, concatenate_videoclips
 import config
+
+# Import moviepy lazily to avoid import errors if not installed
+try:
+    from moviepy.editor import ImageClip, concatenate_videoclips, VideoFileClip
+    MOVIEPY_AVAILABLE = True
+except ImportError:
+    MOVIEPY_AVAILABLE = False
+    ImageClip = None
+    concatenate_videoclips = None
+    VideoFileClip = None
 
 
 class VideoCreator:
@@ -49,6 +58,9 @@ class VideoCreator:
         Returns:
             Path to the created video file
         """
+        if not MOVIEPY_AVAILABLE:
+            raise ImportError("MoviePy is not available. Please install it with: pip install moviepy")
+
         if not image_paths:
             raise ValueError("No images provided for video creation")
 
@@ -168,7 +180,8 @@ class VideoCreator:
         Returns:
             Dictionary with video information
         """
-        from moviepy.editor import VideoFileClip
+        if not MOVIEPY_AVAILABLE:
+            raise ImportError("MoviePy is not available. Please install it with: pip install moviepy")
 
         clip = VideoFileClip(str(video_path))
         info = {
