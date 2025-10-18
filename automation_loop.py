@@ -487,6 +487,10 @@ class AutomationLoop:
 
                     except Exception as e:
                         error_msg = str(e)
+                        # Show full error for debugging
+                        st.error(f"❌ **Video generation failed for Product {product_num}**")
+                        st.error(f"**Error type**: {type(e).__name__}")
+                        st.error(f"**Error message**: {error_msg}")
                         current_item_status.error(f"❌ **Video generation failed**: {error_msg[:150]}")
 
                         # Auto-fallback to Veo3 if Sora 2 fails due to photorealistic people
