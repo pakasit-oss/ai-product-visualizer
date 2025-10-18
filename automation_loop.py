@@ -242,7 +242,8 @@ class AutomationLoop:
         # Initialize generators
         try:
             with suppress_stdout_stderr():
-                kie_gen = KieGenerator() if "Kie.ai" in ai_engine else None
+                # Always initialize kie_gen (needed for imgbb upload in video generation)
+                kie_gen = KieGenerator()
                 prompt_gen = PromptGenerator()
 
         except Exception as e:
