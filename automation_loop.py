@@ -167,21 +167,21 @@ class AutomationLoop:
         """
         product_en = self._extract_english(product_category)
 
-        # วิธี 1: สุ่ม motion styles สำหรับรองเท้า - เน้นโพสธรรมชาติ เคลื่อนไหวช้า โฟกัสสินค้า
+        # Video prompts - เน้นการเคลื่อนไหวของคน ไม่ใช่กล้อง (Sora 2 ทำ camera zoom ได้แต่ไม่ค่อยทำ motion ดี)
         if "shoe" in product_en.lower():
             motion_styles = [
-                f"Person in natural relaxed pose, subtle slow weight shifting from one foot to another showcasing the {product_en}, camera stays focused on product, minimal gentle movement, waist-down view, soft natural motion, cinematic shallow depth of field",
-                f"Slow-motion gentle walking, person takes calm relaxed steps forward in {product_en}, camera locked on product with slight tracking, smooth elegant pace, natural casual movement, product stays in sharp focus throughout",
-                f"Person standing naturally, slow subtle pose adjustments, camera slowly pulls focus to highlight {product_en} details, minimal movement, elegant composition, waist-down perspective, gentle weight shift",
-                f"Natural standing pose, person slowly shifts weight showing different angles of {product_en}, camera maintains steady focus on product, very slow gentle movement, relaxed body language, professional product cinematography"
+                f"Person wearing {product_en} walks slowly forward taking natural steps, full body in frame from waist down, person moves toward camera, steady walking motion, legs and feet movement clearly visible, natural walking pace, person gets closer with each step",
+                f"Model in {product_en} takes relaxed casual steps, walking motion from waist-down view, person strolls naturally, feet stepping forward repeatedly, continuous walking movement, person advances steadily",
+                f"Person walks in {product_en} with natural stride, lower body shot showing legs moving, each foot stepping forward alternately, smooth walking rhythm, person progresses forward continuously, waist-down framing throughout",
+                f"Casual walking in {product_en}, person takes calm steps moving toward viewer, waist-down perspective captures leg movement, natural foot placement with each step, person walks closer progressively, steady forward motion"
             ]
         else:
-            # สำหรับสินค้าอื่นๆ - โพสธรรมชาติ กล้องเคลื่อนไหวช้า โฟกัสสินค้า
+            # สำหรับสินค้าอื่นๆ - เน้นการเคลื่อนไหวของคน
             motion_styles = [
-                f"Person in natural relaxed pose, very slow subtle body movement, camera gently slides around maintaining sharp focus on {product_en}, minimal motion, elegant composition, shallow depth of field keeps product in focus",
-                f"Slow gentle camera dolly, person poses naturally and casually, camera gradually reveals {product_en} details while maintaining focus, smooth elegant movement, relaxed authentic vibe",
-                f"Person in casual natural stance, slow camera orbit around {product_en}, product stays in sharp focus as camera moves, minimal pose adjustments, soft cinematic motion, professional product showcase",
-                f"Natural lifestyle pose, camera slowly zooms in on {product_en} with smooth focus pull, person remains naturally relaxed, very gentle movement, elegant product-focused cinematography"
+                f"Person wearing {product_en} turns body slowly from side to front, natural rotation movement, person twists torso smoothly, shoulder-down view, body rotates to show different angles, continuous turning motion, person completes quarter turn",
+                f"Model showcasing {product_en} shifts weight from one side to other, person sways gently side to side, natural body movement, weight transfer visible, person rocks slowly back and forth, subtle continuous motion",
+                f"Person with {product_en} moves arm to touch or adjust product, hand reaches toward product naturally, person interacts with item, arm movement clearly visible, person gestures toward product area, natural interaction motion",
+                f"Model in {product_en} takes small step forward, person advances one step, body moves toward camera, stepping motion visible, person shifts position forward, natural forward movement, single deliberate step"
             ]
 
         # สุ่มเลือก 1 motion style
