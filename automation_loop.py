@@ -248,9 +248,12 @@ class AutomationLoop:
 
         # Initialize generators
         try:
-            # Always initialize kie_gen (needed for imgbb upload in video generation)
-            kie_gen = KieGenerator()
-            prompt_gen = PromptGenerator()
+            # Suppress stdout/stderr during initialization to prevent I/O errors
+            import contextlib
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                # Always initialize kie_gen (needed for imgbb upload in video generation)
+                kie_gen = KieGenerator()
+                prompt_gen = PromptGenerator()
 
         except Exception as e:
             st.error(f"Error initializing generators: {str(e)}")
