@@ -231,9 +231,6 @@ class AutomationLoop:
             video_method: วิธีสร้างวิดีโอ
             stop_callback: ฟังก์ชันเช็คว่าควรหยุดหรือไม่
         """
-        # Import sys to avoid UnboundLocalError (since we assign to sys.stdout later)
-        import sys as _sys
-
         # Import generators
         try:
             from kie_generator import KieGenerator
@@ -251,27 +248,21 @@ class AutomationLoop:
 
         # Initialize generators
         try:
-            # Suppress stdout/stderr during initialization to prevent I/O errors
-            old_stdout = _sys.stdout
-            old_stderr = _sys.stderr
+            # Suppress print() during initialization to prevent I/O errors
+            # Monkey patch print function instead of redirecting stdout
+            import builtins
+            old_print = builtins.print
 
             try:
-                # Redirect to devnull to prevent I/O errors from print statements
-                devnull = open(os.devnull, 'w')
-                _sys.stdout = devnull
-                _sys.stderr = devnull
+                # Replace print with a no-op function
+                builtins.print = lambda *args, **kwargs: None
 
                 # Always initialize kie_gen (needed for imgbb upload in video generation)
                 kie_gen = KieGenerator()
                 prompt_gen = PromptGenerator()
             finally:
-                # Always restore stdout/stderr
-                _sys.stdout = old_stdout
-                _sys.stderr = old_stderr
-                try:
-                    devnull.close()
-                except:
-                    pass
+                # Always restore print function
+                builtins.print = old_print
 
         except Exception as e:
             st.error(f"Error initializing generators: {str(e)}")
