@@ -690,6 +690,46 @@ def main():
 
         st.divider()
 
+        # ============ KIE.AI CREDIT DISPLAY (PROMINENT) ============
+        # แสดงเครดิต Kie.ai แบบเรียลไทม์
+        if kie_api_key:  # แสดงก็ต่อเมื่อมี API key
+            try:
+                kie_gen_sidebar = KieGenerator()
+                credit_info = kie_gen_sidebar.get_credits()
+
+                if credit_info.get('success'):
+                    credits = credit_info.get('credits', 0)
+                    currency = credit_info.get('currency', 'credits')
+
+                    # แสดงเครดิตแบบเด่นชัด พร้อมสีตามระดับ
+                    if credits == 0:
+                        st.error(f"### 💳 เครดิต: **{credits:,}**")
+                        st.error("⚠️ **เครดิตหมด!**")
+                    elif credits < 50:
+                        st.error(f"### 💳 เครดิต: **{credits:,}**")
+                        st.error("🚨 **เหลือน้อยมาก!**")
+                    elif credits < 200:
+                        st.warning(f"### 💳 เครดิต: **{credits:,}**")
+                        st.warning("⚠️ **เหลือน้อย**")
+                    else:
+                        st.success(f"### 💳 เครดิต: **{credits:,}**")
+
+                    # ปุ่มเติมเครดิต
+                    st.link_button(
+                        "💰 เติมเครดิต Kie.ai",
+                        "https://kie.ai/billing",
+                        use_container_width=True
+                    )
+                else:
+                    st.info("💳 **เครดิต**: ไม่สามารถตรวจสอบได้")
+
+            except Exception as e:
+                # Silent fail หรือแสดงข้อความสั้นๆ
+                st.info(f"💳 **เครดิต**: ไม่สามารถตรวจสอบได้")
+
+            st.divider()
+        # ============ END CREDIT DISPLAY ============
+
         # Statistics
         st.header("📊 Statistics")
         col_stat1, col_stat2 = st.columns(2)
