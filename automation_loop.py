@@ -230,13 +230,14 @@ class AutomationLoop:
             video_method: วิธีสร้างวิดีโอ
             stop_callback: ฟังก์ชันเช็คว่าควรหยุดหรือไม่
         """
-        # Import generators with suppressed output (prevents Windows encoding errors)
+        # Import generators
         try:
-            with suppress_stdout_stderr():
-                from kie_generator import KieGenerator
-                from prompt_generator import PromptGenerator
+            from kie_generator import KieGenerator
+            from prompt_generator import PromptGenerator
         except Exception as e:
             st.error(f"Failed to import generators: {str(e)}")
+            import traceback
+            st.error(traceback.format_exc())
             return
 
         self.is_running = True
@@ -246,14 +247,15 @@ class AutomationLoop:
 
         # Initialize generators
         try:
-            with suppress_stdout_stderr():
-                # Always initialize kie_gen (needed for imgbb upload in video generation)
-                kie_gen = KieGenerator()
-                prompt_gen = PromptGenerator()
+            # Always initialize kie_gen (needed for imgbb upload in video generation)
+            kie_gen = KieGenerator()
+            prompt_gen = PromptGenerator()
 
         except Exception as e:
             st.error(f"Error initializing generators: {str(e)}")
             st.error("Failed to initialize generator. Please check your API key.")
+            import traceback
+            st.error(traceback.format_exc())
             return
 
         # สร้าง UI containers
@@ -642,9 +644,8 @@ def create_automation_tab():
     # ============ CREDIT DISPLAY (PROMINENT) ============
     # แสดงเครดิต Kie.ai แบบเรียลไทม์ที่หัวโปรแกรม
     try:
-        with suppress_stdout_stderr():
-            from kie_generator import KieGenerator
-            kie_gen = KieGenerator()
+        from kie_generator import KieGenerator
+        kie_gen = KieGenerator()
 
         credit_info = kie_gen.get_credits()
 
