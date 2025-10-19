@@ -266,9 +266,28 @@ class AutomationLoop:
 
         except Exception as e:
             st.error(f"Error initializing generators: {str(e)}")
+            st.error(f"Error type: {type(e).__name__}")
             st.error("Failed to initialize generator. Please check your API key.")
             import traceback
-            st.error(traceback.format_exc())
+            with st.expander("🔍 Full Traceback (Click to expand)"):
+                st.code(traceback.format_exc())
+
+            # Try to show which generator failed
+            st.warning("💡 Trying to identify which generator failed...")
+            try:
+                st.info("Testing KieGenerator...")
+                test_kie = KieGenerator()
+                st.success("✅ KieGenerator works")
+            except Exception as e2:
+                st.error(f"❌ KieGenerator failed: {e2}")
+
+            try:
+                st.info("Testing PromptGenerator...")
+                test_prompt = PromptGenerator()
+                st.success("✅ PromptGenerator works")
+            except Exception as e3:
+                st.error(f"❌ PromptGenerator failed: {e3}")
+
             return
 
         # สร้าง UI containers
