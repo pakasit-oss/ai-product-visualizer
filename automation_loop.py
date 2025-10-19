@@ -704,8 +704,22 @@ def create_automation_tab():
     # ============ CREDIT DISPLAY (PROMINENT) ============
     # แสดงเครดิต Kie.ai แบบเรียลไทม์ที่หัวโปรแกรม
     try:
-        from kie_generator import KieGenerator
-        kie_gen = KieGenerator()
+        # Suppress all I/O during import and initialization
+        import builtins
+        import warnings
+
+        old_print = builtins.print
+        old_warnings = warnings.showwarning
+
+        try:
+            builtins.print = lambda *args, **kwargs: None
+            warnings.showwarning = lambda *args, **kwargs: None
+
+            from kie_generator import KieGenerator
+            kie_gen = KieGenerator()
+        finally:
+            builtins.print = old_print
+            warnings.showwarning = old_warnings
 
         credit_info = kie_gen.get_credits()
 
