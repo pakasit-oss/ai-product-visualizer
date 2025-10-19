@@ -249,7 +249,6 @@ class AutomationLoop:
         # Initialize generators
         try:
             # Suppress stdout/stderr during initialization to prevent I/O errors
-            import os
             old_stdout = sys.stdout
             old_stderr = sys.stderr
 
