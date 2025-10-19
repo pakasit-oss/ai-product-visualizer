@@ -18,12 +18,13 @@ if sys.platform == 'win32':
     try:
         sys.stdout.reconfigure(encoding='utf-8')
         sys.stderr.reconfigure(encoding='utf-8')
-    except (AttributeError, OSError):
+    except (AttributeError, OSError, ValueError):
         # Python < 3.7 or Streamlit environment where reconfigure is not allowed
+        # ValueError: closed file, OSError: invalid argument, AttributeError: no reconfigure
         try:
             sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
             sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
-        except (AttributeError, OSError):
+        except (AttributeError, OSError, ValueError):
             # Streamlit environment - stdout/stderr are already handled, skip
             pass
 
