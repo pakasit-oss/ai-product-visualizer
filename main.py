@@ -141,6 +141,23 @@ def initialize_generators():
         return None, None, None
 
 
+def track_credit_usage(credits_used: int, is_image: bool = True):
+    """
+    Track Kie.ai credit usage
+
+    Args:
+        credits_used: Number of credits consumed
+        is_image: True for image generation, False for video generation
+    """
+    if 'kie_credits_used' in st.session_state:
+        st.session_state.kie_credits_used += credits_used
+
+        if is_image and 'kie_images_count' in st.session_state:
+            st.session_state.kie_images_count += 1
+        elif not is_image and 'kie_videos_count' in st.session_state:
+            st.session_state.kie_videos_count += 1
+
+
 def generate_random_prompt_settings(product_category: str, gender: str, age_range: str):
     """
     Generate random prompt settings that match product, gender, and age
@@ -507,6 +524,9 @@ def one_click_generation(images_per_product=3, video_method="Sora 2"):
                     }
                     st.session_state.generated_videos.append(video_data)
 
+                    # Track credit usage for video (Veo3/Sora2 ~50-100 credits)
+                    track_credit_usage(75, is_image=False)  # Average 75 credits per video
+
                     videos_created += 1
 
                     # อัปเดต progress
@@ -690,35 +710,81 @@ def main():
 
         st.divider()
 
-        # ============ KIE.AI CREDIT INFO ============
-        # แสดงข้อมูลเครดิต Kie.ai (ไม่มี API สำหรับเช็คอัตโนมัติ)
+        # ============ KIE.AI CREDIT TRACKER ============
+        # Manual credit tracking system (Kie.ai API doesn't provide credits endpoint)
         if kie_api_key:  # แสดงก็ต่อเมื่อมี API key
-            st.info("### 💳 **Kie.ai Credits**")
-            st.info("เช็คเครดิตปัจจุบันที่หน้า Billing ↓")
+            # Initialize credits tracking in session state
+            if 'kie_credits' not in st.session_state:
+                st.session_state.kie_credits = 0  # User needs to set initial value
+            if 'kie_credits_used' not in st.session_state:
+                st.session_state.kie_credits_used = 0
+            if 'kie_images_count' not in st.session_state:
+                st.session_state.kie_images_count = 0
+            if 'kie_videos_count' not in st.session_state:
+                st.session_state.kie_videos_count = 0
 
-            # ปุ่มเปิดหน้า Billing
+            # Calculate remaining credits
+            remaining_credits = st.session_state.kie_credits - st.session_state.kie_credits_used
+
+            # Display credits with color coding
+            if remaining_credits == 0 and st.session_state.kie_credits > 0:
+                st.error(f"### 💳 เครดิต: **{remaining_credits:,}**")
+                st.error("⚠️ **เครดิตหมด!**")
+            elif remaining_credits < 100:
+                st.error(f"### 💳 เครดิต: **{remaining_credits:,}**")
+                st.error("🚨 **เครดิตเหลือน้อยมาก!**")
+            elif remaining_credits < 500:
+                st.warning(f"### 💳 เครดิต: **{remaining_credits:,}**")
+                st.warning("⚠️ **เครดิตเหลือน้อย**")
+            elif st.session_state.kie_credits == 0:
+                st.info("### 💳 **เครดิต: ยังไม่ตั้งค่า**")
+                st.info("👇 กรอกเครดิตเริ่มต้นด้านล่าง")
+            else:
+                st.success(f"### 💳 เครดิต: **{remaining_credits:,}**")
+
+            # Show usage stats if any
+            if st.session_state.kie_credits_used > 0:
+                st.caption(f"📊 ใช้ไป: {st.session_state.kie_credits_used:,} credits")
+                st.caption(f"🎨 รูป: {st.session_state.kie_images_count} | 🎬 วิดีโอ: {st.session_state.kie_videos_count}")
+
+            # Input for initial/updated credits
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                new_credits = st.number_input(
+                    "อัพเดทเครดิต",
+                    min_value=0,
+                    value=st.session_state.kie_credits if st.session_state.kie_credits > 0 else 9968,
+                    step=100,
+                    help="ใส่จำนวนเครดิตจากหน้า Kie.ai billing"
+                )
+            with col2:
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("✅ ตั้งค่า", use_container_width=True):
+                    st.session_state.kie_credits = new_credits
+                    st.session_state.kie_credits_used = 0
+                    st.session_state.kie_images_count = 0
+                    st.session_state.kie_videos_count = 0
+                    st.success(f"✅ ตั้งค่าเครดิต: {new_credits:,}")
+                    st.rerun()
+
+            # Link to billing page
             st.link_button(
-                "🔍 เช็คเครดิต & เติมเงิน",
+                "🔍 เช็คเครดิตที่ Kie.ai",
                 "https://kie.ai/billing",
-                use_container_width=True,
-                type="primary"
+                use_container_width=True
             )
 
-            # แสดงข้อมูล usage โดยประมาณ
-            with st.expander("💡 ราคาโดยประมาณ"):
-                st.markdown("""
-                **ค่าใช้จ่ายโดยประมาณ:**
-                - 🎨 สร้างรูป (Nano Banana): ~10-15 credits/รูป
-                - 🎬 สร้างวิดีโอ (Veo3): ~50-100 credits/วิดีโอ
-                - 🎬 สร้างวิดีโอ (Sora 2): ~50-100 credits/วิดีโอ
-
-                **💡 Tips:**
-                - เช็คเครดิตก่อนเริ่ม Auto Loop
-                - ระบบจะหยุดอัตโนมัติถ้ารันติดต่อกัน 5 ครั้งไม่สำเร็จ
-                """)
+            # Reset button
+            if st.session_state.kie_credits_used > 0:
+                if st.button("🔄 รีเซ็ต Usage", use_container_width=True):
+                    st.session_state.kie_credits_used = 0
+                    st.session_state.kie_images_count = 0
+                    st.session_state.kie_videos_count = 0
+                    st.success("✅ รีเซ็ต usage แล้ว")
+                    st.rerun()
 
             st.divider()
-        # ============ END CREDIT INFO ============
+        # ============ END CREDIT TRACKER ============
 
         # Statistics
         st.header("📊 Statistics")
@@ -1370,6 +1436,9 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 )
 
                 print(f"Kie.ai generation {i+1} completed successfully")
+
+                # Track credit usage (Kie.ai Nano Banana ~10-15 credits per image)
+                track_credit_usage(12, is_image=True)  # Average 12 credits per image
 
                 # Store in session state
                 image_data = {
@@ -2230,6 +2299,9 @@ def create_sora2_video_section():
                 }
                 st.session_state.generated_videos.append(video_data)
 
+                # Track credit usage for Sora 2 video (~50-100 credits)
+                track_credit_usage(75, is_image=False)  # Average 75 credits per video
+
                 st.success(f"✅ สร้างวิดีโอด้วย Sora 2 สำเร็จ! (ใช้เวลา {elapsed_str})")
                 st.info(f"📝 Task ID: {result['task_id']}")
                 st.info(f"🌐 Image URL: {final_image_url}")
@@ -2595,6 +2667,9 @@ def create_veo3_video_section():
                 'elapsed_time': elapsed_str
             }
             st.session_state.generated_videos.append(video_data)
+
+            # Track credit usage for Veo3 video (~50-100 credits)
+            track_credit_usage(75, is_image=False)  # Average 75 credits per video
 
             st.success(f"✅ สร้างวิดีโอด้วย Veo3 สำเร็จ! (ใช้เวลา {elapsed_str})")
             st.info(f"📝 Task ID: {result['task_id']}")
