@@ -702,64 +702,67 @@ def create_automation_tab():
     st.markdown("### วนลูปสร้างรูปและคลิปอัตโนมัติ: รูป → คลิป → รูป → คลิป...")
 
     # ============ CREDIT DISPLAY (PROMINENT) ============
-    # แสดงเครดิต Kie.ai แบบเรียลไทม์ที่หัวโปรแกรม
-    try:
-        # Suppress all I/O during import and initialization
-        import builtins
-        import warnings
+    # TEMPORARILY DISABLED to debug I/O error
+    st.info("💳 Credit display temporarily disabled for debugging")
 
-        old_print = builtins.print
-        old_warnings = warnings.showwarning
-
+    if False:  # Entire credit section disabled
         try:
-            builtins.print = lambda *args, **kwargs: None
-            warnings.showwarning = lambda *args, **kwargs: None
+            # Suppress all I/O during import and initialization
+            import builtins
+            import warnings
 
-            from kie_generator import KieGenerator
-            kie_gen = KieGenerator()
-        finally:
-            builtins.print = old_print
-            warnings.showwarning = old_warnings
+            old_print = builtins.print
+            old_warnings = warnings.showwarning
 
-        credit_info = kie_gen.get_credits()
+            try:
+                builtins.print = lambda *args, **kwargs: None
+                warnings.showwarning = lambda *args, **kwargs: None
 
-        if credit_info.get('success'):
-            credits = credit_info.get('credits', 0)
-            currency = credit_info.get('currency', 'credits')
+                from kie_generator import KieGenerator
+                kie_gen = KieGenerator()
+            finally:
+                builtins.print = old_print
+                warnings.showwarning = old_warnings
 
-            # แสดงเครดิตแบบเด่นชัด พร้อมสี
-            credit_col1, credit_col2 = st.columns([3, 1])
+            credit_info = kie_gen.get_credits()
 
-            with credit_col1:
-                # เลือกสีตามจำนวนเครดิต
-                if credits == 0:
-                    st.error(f"### 💳 เครดิต: **{credits:,}** {currency}")
-                    st.error("⚠️ **เครดิตหมด!** กรุณาเติมเครดิตก่อนใช้งาน")
-                elif credits < 50:
-                    st.error(f"### 💳 เครดิต: **{credits:,}** {currency}")
-                    st.error("🚨 **เครดิตเหลือน้อยมาก!** ระบบจะหยุดอัตโนมัติเมื่อเครดิต < 50")
-                elif credits < 200:
-                    st.warning(f"### 💳 เครดิต: **{credits:,}** {currency}")
-                    st.warning("⚠️ **เครดิตเหลือน้อย** - แนะนำให้เติมเครดิต")
-                else:
-                    st.success(f"### 💳 เครดิต: **{credits:,}** {currency}")
-                    st.info("✅ เครดิตเพียงพอสำหรับการใช้งาน")
+            if credit_info.get('success'):
+                credits = credit_info.get('credits', 0)
+                currency = credit_info.get('currency', 'credits')
 
-            with credit_col2:
-                st.markdown("<br>", unsafe_allow_html=True)  # Spacing
-                st.link_button(
-                    "💰 เติมเครดิต",
-                    "https://kie.ai/billing",
-                    help="เปิดหน้าเติมเครดิต Kie.ai",
-                    use_container_width=True
-                )
-        else:
-            # ไม่สามารถเช็คเครดิตได้
-            st.info("💳 **เครดิต**: ไม่สามารถตรวจสอบได้")
+                # แสดงเครดิตแบบเด่นชัด พร้อมสี
+                credit_col1, credit_col2 = st.columns([3, 1])
 
-    except Exception as e:
-        # Silent fail - แสดงข้อความสั้นๆ
-        st.warning(f"💳 **เครดิต**: ไม่สามารถตรวจสอบได้ ({str(e)[:50]})")
+                with credit_col1:
+                    # เลือกสีตามจำนวนเครดิต
+                    if credits == 0:
+                        st.error(f"### 💳 เครดิต: **{credits:,}** {currency}")
+                        st.error("⚠️ **เครดิตหมด!** กรุณาเติมเครดิตก่อนใช้งาน")
+                    elif credits < 50:
+                        st.error(f"### 💳 เครดิต: **{credits:,}** {currency}")
+                        st.error("🚨 **เครดิตเหลือน้อยมาก!** ระบบจะหยุดอัตโนมัติเมื่อเครดิต < 50")
+                    elif credits < 200:
+                        st.warning(f"### 💳 เครดิต: **{credits:,}** {currency}")
+                        st.warning("⚠️ **เครดิตเหลือน้อย** - แนะนำให้เติมเครดิต")
+                    else:
+                        st.success(f"### 💳 เครดิต: **{credits:,}** {currency}")
+                        st.info("✅ เครดิตเพียงพอสำหรับการใช้งาน")
+
+                with credit_col2:
+                    st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+                    st.link_button(
+                        "💰 เติมเครดิต",
+                        "https://kie.ai/billing",
+                        help="เปิดหน้าเติมเครดิต Kie.ai",
+                        use_container_width=True
+                    )
+            else:
+                # ไม่สามารถเช็คเครดิตได้
+                st.info("💳 **เครดิต**: ไม่สามารถตรวจสอบได้")
+
+        except Exception as e:
+            # Silent fail - แสดงข้อความสั้นๆ
+            st.warning(f"💳 **เครดิต**: ไม่สามารถตรวจสอบได้ ({str(e)[:50]})")
 
     st.divider()
     # ============ END CREDIT DISPLAY ============
