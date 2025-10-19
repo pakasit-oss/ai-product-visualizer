@@ -18,7 +18,6 @@ from dalle_generator import DALLEGenerator, sanitize_filename
 from kie_generator import KieGenerator
 from veo_video_creator import Veo3VideoCreator
 from sora2_video_creator import Sora2VideoCreator
-from automation_loop import create_automation_tab
 
 # Import VideoCreator with optional moviepy support
 try:
@@ -816,7 +815,14 @@ def main():
 
     # Tab 3: Auto Loop (NEW!)
     with tabs[2]:
-        create_automation_tab()
+        try:
+            from automation_loop import create_automation_tab
+            create_automation_tab()
+        except Exception as e:
+            st.error(f"❌ Error loading Auto Loop: {str(e)}")
+            import traceback
+            with st.expander("📋 Full Error Details"):
+                st.code(traceback.format_exc())
 
     # Tab 4: Gallery
     with tabs[3]:
@@ -3059,4 +3065,11 @@ def batch_generate_all_products(
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        st.error(f"❌ Critical Error: {str(e)}")
+        import traceback
+        st.error("**Full Traceback:**")
+        st.code(traceback.format_exc())
+        st.warning("กรุณา screenshot error นี้และแจ้งทีมพัฒนา")
