@@ -1946,7 +1946,8 @@ def create_video_tab():
             # Show credits
             if st.session_state.kie_credits is not None:
                 credits_info = st.session_state.kie_credits
-                if credits_info.get('success'):
+                # Check if credits_info is a dictionary (from API) not a number (from manual tracking)
+                if isinstance(credits_info, dict) and credits_info.get('success'):
                     credits = credits_info.get('credits', 0)
                     # Format credits - ถ้าเป็นเลขจำนวนเต็ม ไม่แสดงทศนิยม
                     if isinstance(credits, (int, float)):
@@ -1959,12 +1960,16 @@ def create_video_tab():
 
                     # แสดงเครดิตแบบเด่นชัด
                     st.success(f"💰 **เครดิตคงเหลือ: {credits_formatted} credits**")
-                else:
+                elif isinstance(credits_info, dict):
+                    # credits_info is dict but success is False
                     # Don't show error if it's silent (404)
                     if not credits_info.get('silent'):
                         st.warning(f"⚠️ ไม่สามารถดึงข้อมูลเครดิต: {credits_info.get('error', 'Unknown error')}")
                     else:
                         st.info("💰 **เครดิต:** ไม่สามารถดึงข้อมูลได้ (API ไม่รองรับ)")
+                else:
+                    # credits_info is not a dict (probably a number from manual tracking)
+                    st.info("💰 **เครดิต:** ใช้ระบบติดตามแบบ Manual (ดูที่ Config)")
             else:
                 st.info("💰 **เครดิต:** กำลังโหลด...")
 
