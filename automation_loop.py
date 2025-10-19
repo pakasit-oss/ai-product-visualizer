@@ -249,11 +249,27 @@ class AutomationLoop:
         # Initialize generators
         try:
             # Suppress stdout/stderr during initialization to prevent I/O errors
-            import contextlib
-            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            import os
+            old_stdout = sys.stdout
+            old_stderr = sys.stderr
+
+            try:
+                # Redirect to devnull to prevent I/O errors from print statements
+                devnull = open(os.devnull, 'w')
+                sys.stdout = devnull
+                sys.stderr = devnull
+
                 # Always initialize kie_gen (needed for imgbb upload in video generation)
                 kie_gen = KieGenerator()
                 prompt_gen = PromptGenerator()
+            finally:
+                # Always restore stdout/stderr
+                sys.stdout = old_stdout
+                sys.stderr = old_stderr
+                try:
+                    devnull.close()
+                except:
+                    pass
 
         except Exception as e:
             st.error(f"Error initializing generators: {str(e)}")
