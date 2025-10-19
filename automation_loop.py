@@ -231,14 +231,30 @@ class AutomationLoop:
             video_method: วิธีสร้างวิดีโอ
             stop_callback: ฟังก์ชันเช็คว่าควรหยุดหรือไม่
         """
-        # Import generators
+        # Import generators with detailed error handling
+        KieGenerator = None
+        PromptGenerator = None
+
         try:
+            st.info("📦 Importing KieGenerator...")
             from kie_generator import KieGenerator
-            from prompt_generator import PromptGenerator
+            st.success("✅ KieGenerator imported")
         except Exception as e:
-            st.error(f"Failed to import generators: {str(e)}")
+            st.error(f"❌ Failed to import KieGenerator: {str(e)}")
             import traceback
-            st.error(traceback.format_exc())
+            with st.expander("Full Import Error"):
+                st.code(traceback.format_exc())
+            return
+
+        try:
+            st.info("📦 Importing PromptGenerator...")
+            from prompt_generator import PromptGenerator
+            st.success("✅ PromptGenerator imported")
+        except Exception as e:
+            st.error(f"❌ Failed to import PromptGenerator: {str(e)}")
+            import traceback
+            with st.expander("Full Import Error"):
+                st.code(traceback.format_exc())
             return
 
         self.is_running = True
