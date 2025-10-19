@@ -1421,7 +1421,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 kie_gen = KieGenerator()
 
                 # Extract English name from product_category for ASCII-safe filename
-                english_name = product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_')
+                english_name = sanitize_filename(product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_'))
 
                 # Auto-upload and generate image with Kie.ai Nano Banana
                 # Images will be automatically uploaded to imgbb
@@ -1467,7 +1467,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 print("="*80)
 
                 # Generate with Gemini Imagen
-                english_name = product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_')
+                english_name = sanitize_filename(product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_'))
 
                 result = dalle_gen.generate_image(
                     prompt=prompt,
@@ -1508,7 +1508,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
 
                 # Generate image with Hybrid approach
                 # Extract English name from product_category for ASCII-safe filename
-                english_name = product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_')
+                english_name = sanitize_filename(product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_'))
 
                 result = dalle_gen.generate_with_gemini_analysis_then_sdxl(
                     prompt=prompt,
@@ -1552,7 +1552,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
 
                 # Generate analysis with Gemini Pro Vision
                 # Extract English name from product_category for ASCII-safe filename
-                english_name = product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_')
+                english_name = sanitize_filename(product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_'))
 
                 result = dalle_gen.generate_with_gemini_vision(
                     prompt=prompt,
@@ -1596,7 +1596,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
 
                 # Generate image with SDXL Smart (Simple img2img)
                 # Extract English name from product_category for ASCII-safe filename
-                english_name = product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_')
+                english_name = sanitize_filename(product_category.split('(')[1].split(')')[0].strip().lower().replace(' ', '_'))
 
                 # Pass advanced params if available
                 seed = advanced_params.get('seed') if advanced_params else None
