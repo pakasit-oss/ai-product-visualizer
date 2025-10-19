@@ -246,23 +246,35 @@ class AutomationLoop:
         self.total_products_skipped = 0
         self.consecutive_failures = 0  # Track consecutive failures
 
-        # Initialize generators
+        # Initialize generators with maximum safety
+        kie_gen = None
+        prompt_gen = None
+
         try:
-            # Suppress print() during initialization to prevent I/O errors
-            # Monkey patch print function instead of redirecting stdout
+            # Try to initialize with all protections
             import builtins
+            import warnings
+
             old_print = builtins.print
+            old_warnings = warnings.showwarning
 
             try:
-                # Replace print with a no-op function
+                # Suppress everything during init
                 builtins.print = lambda *args, **kwargs: None
+                warnings.showwarning = lambda *args, **kwargs: None
 
-                # Always initialize kie_gen (needed for imgbb upload in video generation)
+                st.info("Initializing KieGenerator...")
                 kie_gen = KieGenerator()
+                st.success("✅ KieGenerator initialized")
+
+                st.info("Initializing PromptGenerator...")
                 prompt_gen = PromptGenerator()
+                st.success("✅ PromptGenerator initialized")
+
             finally:
-                # Always restore print function
+                # Always restore
                 builtins.print = old_print
+                warnings.showwarning = old_warnings
 
         except Exception as e:
             st.error(f"Error initializing generators: {str(e)}")
