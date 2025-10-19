@@ -10,6 +10,7 @@ import os
 import requests
 import base64
 import io
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict
@@ -17,6 +18,33 @@ from openai import OpenAI
 from PIL import Image
 import google.generativeai as genai
 import config
+
+
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitize filename to remove invalid characters for Windows/Linux filesystems
+
+    Args:
+        filename: Original filename
+
+    Returns:
+        Safe filename without invalid characters
+    """
+    # Remove invalid characters: < > : " / \ | ? *
+    invalid_chars = r'[<>:"/\\|?*]'
+    sanitized = re.sub(invalid_chars, '_', filename)
+
+    # Remove leading/trailing spaces and dots
+    sanitized = sanitized.strip(' .')
+
+    # Limit length to 200 characters (leave room for timestamp and extension)
+    if len(sanitized) > 200:
+        sanitized = sanitized[:200]
+
+    # Replace multiple underscores with single one
+    sanitized = re.sub(r'_+', '_', sanitized)
+
+    return sanitized
 
 
 class DALLEGenerator:

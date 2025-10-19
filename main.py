@@ -14,7 +14,7 @@ import random
 # Import local modules
 import config
 from prompt_generator import PromptGenerator
-from dalle_generator import DALLEGenerator
+from dalle_generator import DALLEGenerator, sanitize_filename
 from kie_generator import KieGenerator
 from veo_video_creator import Veo3VideoCreator
 from sora2_video_creator import Sora2VideoCreator
@@ -919,7 +919,7 @@ def upload_and_generate_tab():
             image = Image.open(uploaded_file)
             # Save to temp file for all modes that need reference images
             if ai_engine != "DALL·E 3 (ปกติ)":
-                temp_path = config.IMAGES_DIR / f"temp_ref_{uploaded_file.name}"
+                temp_path = config.IMAGES_DIR / f"temp_ref_{sanitize_filename(uploaded_file.name)}"
                 image.save(temp_path)
                 st.session_state.uploaded_reference_images.append(str(temp_path))
                 st.success(f"✅ บันทึก: {temp_path}")
@@ -1430,7 +1430,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 result = kie_gen.generate_image(
                     prompt=prompt,
                     reference_image_paths=[ref_image],  # Local path - will auto-upload
-                    filename_prefix=f"kie_{english_name}",
+                    filename_prefix=sanitize_filename(f"kie_{english_name}"),
                     image_size="9:16",
                     imgbb_api_key=config.IMGBB_API_KEY
                 )
@@ -1471,7 +1471,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
 
                 result = dalle_gen.generate_image(
                     prompt=prompt,
-                    filename_prefix=f"imagen_{english_name}"
+                    filename_prefix=sanitize_filename(f"imagen_{english_name}")
                 )
 
                 print(f"Gemini Imagen generation {i+1} completed successfully")
@@ -1513,7 +1513,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 result = dalle_gen.generate_with_gemini_analysis_then_sdxl(
                     prompt=prompt,
                     reference_image_path=ref_image,
-                    filename_prefix=f"hybrid_{english_name}"
+                    filename_prefix=sanitize_filename(f"hybrid_{english_name}")
                 )
 
                 print(f"Hybrid generation {i+1} completed successfully")
@@ -1557,7 +1557,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 result = dalle_gen.generate_with_gemini_vision(
                     prompt=prompt,
                     reference_image_path=ref_image,
-                    filename_prefix=f"gemini_{english_name}"
+                    filename_prefix=sanitize_filename(f"gemini_{english_name}")
                 )
 
                 print(f"Analysis {i+1} completed successfully")
@@ -1608,7 +1608,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 result = dalle_gen.generate_with_sdxl_simple(
                     prompt=prompt,
                     reference_image_path=ref_image,
-                    filename_prefix=f"sdxl_{english_name}",
+                    filename_prefix=sanitize_filename(f"sdxl_{english_name}"),
                     seed=actual_seed,
                     prompt_strength=prompt_str
                 )
@@ -1637,7 +1637,7 @@ def generate_images_from_prompt(prompt, product_category, gender, age_range, num
                 # Generate image with DALL-E
                 result = dalle_gen.generate_image(
                     prompt=prompt,
-                    filename_prefix=f"dalle_{product_category.split('(')[0].strip()}"
+                    filename_prefix=sanitize_filename(f"dalle_{product_category.split('(')[0].strip()}")
                 )
 
                 # Store in session state
