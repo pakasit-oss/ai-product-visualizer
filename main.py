@@ -18,6 +18,7 @@ from dalle_generator import DALLEGenerator, sanitize_filename
 from kie_generator import KieGenerator
 from veo_video_creator import Veo3VideoCreator
 from sora2_video_creator import Sora2VideoCreator
+from automation_loop import create_automation_tab
 
 # Import VideoCreator with optional moviepy support
 try:
@@ -815,7 +816,6 @@ def main():
 
     # Tab 3: Auto Loop (NEW!)
     with tabs[2]:
-        from automation_loop import create_automation_tab
         create_automation_tab()
 
     # Tab 4: Gallery
